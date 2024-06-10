@@ -3,13 +3,17 @@
 ## Project Overview
 This repository contains two Jupyter notebooks focused on Exploratory Data Analysis (EDA) and Machine Learning using the Boston Open Data dataset from Kaggle.
 
+
 ## Dataset
 The dataset used in this project is the Boston Open Data, which can be found on [Kaggle](https://www.kaggle.com/datasets).
+
+link: https://www.kaggle.com/datasets/airbnb/boston
+
 
 ## Notebooks
 
 ### 1. Exploratory Data Analysis (EDA)
-- **Filename:** `EDA.ipynb`
+- **Filename:** `EDA_Boston_Airbnb_Open_Data.ipynb`
 - **Description:** This notebook performs an in-depth exploratory data analysis on the Boston Open Data dataset. Key steps include:
   - Data cleaning and preprocessing
   - Descriptive statistics
@@ -17,17 +21,11 @@ The dataset used in this project is the Boston Open Data, which can be found on 
   - Insights and findings
 
 ### 2. Machine Learning
-- **Filename:** `Machine_Learning.ipynb`
-- **Description:** This notebook applies various machine learning algorithms to the Boston Open Data dataset. Key steps include:
+- **Filename:** `Model_Boston_Airbnb_Open_Data.ipynb`
+- **Description:** This notebook applies machine learning algorithms to the Boston Open Data dataset. Key steps include:
   - Data preprocessing
   - Model training and evaluation
-  - Hyperparameter tuning
   - Model performance comparison
-
-## How to Run the Notebooks
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/your-repo.git
 
 for any question:
 niltonjuniorphd@gmail.com
