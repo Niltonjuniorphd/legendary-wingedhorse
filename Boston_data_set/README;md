@@ -27,5 +27,13 @@ link: https://www.kaggle.com/datasets/airbnb/boston
   - Model training and evaluation
   - Model performance comparison
 
+### 3.Libraries
+  -pandas version: 2.0.3
+  -seaborn version: 0.13.1
+  -folium version: 0.14.0
+  -geopandas version: 0.13.2
+  -matplotlib Version: 3.7.1
+  -sklearn version: 1.2.2
+
 for any question:
 niltonjuniorphd@gmail.com
