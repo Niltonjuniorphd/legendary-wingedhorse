@@ -1,0 +1,1 @@
+project dedicated to train ML Skils using the Titanic classic dataset
