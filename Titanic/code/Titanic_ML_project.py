@@ -47,7 +47,7 @@ def is_equal(df, feature):
 
 
 # %%
-df = pd.read_csv('C:/Git projects/labelary-wingedhorse/Titanic/data/train.csv')
+df = pd.read_csv('C:/Git projects/legendary-wingedhorse/Titanic/data/train.csv')
 
 # %%
 # Describe the status of data. Is there any missing data, if so in which columns?
@@ -85,10 +85,7 @@ is_equal(df, 'Age')
 # Is there difference in the fares of people who suvived and who did not?
 is_equal(df, 'Fare')
 
-
 # %%
-df = df.drop('PassengerId', axis=1)
-
 
 
 # %%
@@ -96,7 +93,8 @@ df = df.drop('PassengerId', axis=1)
 EDA_module.hb_plot(df, 'Age')
 
 # %%
-EDA_module.deep_hb_plot(df)
+df2 = df.drop('PassengerId', axis=1)
+EDA_module.deep_hb_plot(df2)
 
 # %%
 sns.barplot(df, x="SibSp", y="Survived", hue="Sex")
@@ -107,7 +105,8 @@ df.groupby(['SibSp'])['Survived'].agg(['count', 'sum', 'mean'])
 # %%
 df.groupby(['Parch'])['Survived'].agg(['count', 'sum', 'mean'])
 
-
+# %%
+df.groupby(df[df['Survived']==1]['Parch'])['Survived'].agg(['count', 'sum', 'mean'])
 
 # %%
 sns.countplot(data=df, x="SibSp", hue='Sex') #, y="Sex", hue="Sex")
@@ -120,12 +119,16 @@ sns.countplot(data=df, x="Parch", hue='Sex') #, y="Sex", hue="Sex")
 df['Name']
 
 # %%
-names = pd.Series([df['Name'].apply(lambda x: x.split(','))[i][0] for i in range(len(name))])
+surnames = pd.Series([df['Name'].apply(lambda x: x.split(','))[i][0] for i in range(len(df['Name']))])
+surnames 
 
 # %%
-names.value_counts()
+surnames.value_counts()
 
 # %%
-names.value_counts().value_counts().sort_index()
+surnames.value_counts().value_counts().sort_index()
+
+# %%
+surnames.nunique()
 
 # %%

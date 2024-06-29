@@ -17,3 +17,6 @@ fare	Passenger fare
 cabin	Cabin number	
 
 embarked	Port of Embarkation	C = Cherbourg, Q = Queenstown, S = Southampton
+
+# site:
+https://bibinmjose.github.io/explore_titanic_data/
