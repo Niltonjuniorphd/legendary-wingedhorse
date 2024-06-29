@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
 def hb_plot(df, feature):
     '''
     plot the histogram and boxplot
@@ -52,3 +51,4 @@ def deep_hb_plot(df):
             ax[1].axvline(df[i].mode()[j], color='y', label='Mode')
         ax[1].legend()
         plt.show()
+
