@@ -132,3 +132,5 @@ surnames.value_counts().value_counts().sort_index()
 surnames.nunique()
 
 # %%
+pd.Series(list(zip(df['SibSp'], df['Parch']))).value_counts()
+# %%
