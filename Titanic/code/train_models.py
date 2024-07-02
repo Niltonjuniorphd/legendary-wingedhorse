@@ -10,22 +10,23 @@ from feature_engine import encoding
 from feature_engine import imputation
 
 from modules import new_feature
-
+from modules import personal
 
 # %%
 # Data
-df0 = pd.read_csv('C:/Git projects/legendary-wingedhorse/Titanic/data/train.csv')
+df0 = pd.read_csv(
+    'C:/Git projects/legendary-wingedhorse/Titanic/data/train.csv')
 df = df0.copy()
 
 # %%
-#Sample
+# Sample
 target = 'Survived'
 features = df.drop('Survived', axis=1).columns.tolist()
 
 df_valid = df.sample(frac=0.02,  random_state=42)
 df_train = df.drop(df_valid.index)
 
-#Explore
+# Explore
 df.info()
 df_valid.info()
 df_train.info()
@@ -43,7 +44,7 @@ X_train, X_test, y_train, y_test = model_selection.train_test_split(
     random_state=42,
     stratify=df_train[target])
 
-#explore
+# explore
 print(f'response rate y_train = {y_train.mean()}')
 print(f'response rate y_test  = {y_test.mean()}')
 
@@ -61,10 +62,14 @@ cat_missing = ['Cabin', 'Embarked']
 cat_features = X_train.select_dtypes('object').columns.to_list()
 
 to_drop = selection.DropFeatures(features_to_drop=features_to_drop)
-num_imput = imputation.MeanMedianImputer(imputation_method='mean', variables=num_missing)
-cat_imput = imputation.CategoricalImputer(imputation_method='frequent', variables=cat_missing)
+num_imput = imputation.MeanMedianImputer(
+    imputation_method='mean', variables=num_missing)
+cat_imput = imputation.CategoricalImputer(
+    imputation_method='frequent', variables=cat_missing)
 new_feature = new_feature.NewFeatureAdder()
-onehot = encoding.OneHotEncoder() #variables=cat_features)
+perso_name = personal.PersonalTitle()
+onehot = encoding.OneHotEncoder()  # variables=cat_features)
+
 
 # %%
 model = ensemble.RandomForestClassifier(random_state=42)
@@ -76,21 +81,21 @@ param = {
 
 }
 
-grid = model_selection.GridSearchCV(model, 
+grid = model_selection.GridSearchCV(model,
                                     param_grid=param,
                                     scoring='roc_auc',
                                     cv=3,
                                     n_jobs=-1)
 
 model_pipe = pipeline.Pipeline([
+    ('perso_name', perso_name),
+    ('new_feature', new_feature),
     ('to_drop', to_drop),
     ('num_imput', num_imput),
     ('cat_imput', cat_imput),
-    ('new_feature', new_feature),
     ('onehot', onehot),
     ('model', grid)
 ])
-
 
 
 # %%
@@ -102,30 +107,27 @@ train_pred = model_pipe.predict_proba(X_train)
 test_pred = model_pipe.predict_proba(X_test)
 val_pred = model_pipe.predict_proba(df_valid[features])
 
-auc_train = metrics.roc_auc_score(y_train, train_pred[:,1])
-auc_test = metrics.roc_auc_score(y_test, test_pred[:,1])
-auc_val = metrics.roc_auc_score(df_valid[target], val_pred[:,1])
+auc_train = metrics.roc_auc_score(y_train, train_pred[:, 1])
+auc_test = metrics.roc_auc_score(y_test, test_pred[:, 1])
+auc_val = metrics.roc_auc_score(df_valid[target], val_pred[:, 1])
 
 print("AUC Score train:", auc_train)
 print("AUC Score test:", auc_test)
 print("AUC Score val:", auc_val)
 
 # %%
-df_test = pd.read_csv('C:/Git projects/legendary-wingedhorse/Titanic/data/test.csv')
+df_test = pd.read_csv(
+    'C:/Git projects/legendary-wingedhorse/Titanic/data/test.csv')
 
 # %%
 df_test.info()
 
-
 # %%
-
 K_test_pred_proba = model_pipe.predict_proba(df_test)
 K_test_pred = model_pipe.predict(df_test)
-# %%
+
 
 # %%
-K_test_pred
-
-# %%
-new_return_test = new_feature.transform(X_train)
+pernal = personal.PersonalTitle()
+per = pernal.transform(df)
 # %%

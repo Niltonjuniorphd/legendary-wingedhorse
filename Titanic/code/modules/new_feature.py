@@ -42,7 +42,8 @@ class NewFeatureAdder(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         df_new = X.copy()
-        zp = pd.Series(zip(df_new['SibSp'], df_new['Parch']), index=df_new.index, name='Sib_Par')
+        zp = pd.Series(zip(df_new['SibSp'], df_new['Parch']),
+                       index=df_new.index, name='Sib_Par')
         df_new = pd.concat([df_new, zp], axis=1)
 
         return df_new
