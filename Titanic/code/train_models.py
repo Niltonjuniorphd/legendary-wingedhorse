@@ -16,6 +16,7 @@ from modules import personal
 # Data
 df0 = pd.read_csv(
     'C:/Git projects/legendary-wingedhorse/Titanic/data/train.csv')
+df0['Pclass'] = df0['Pclass'].astype('object')
 df = df0.copy()
 
 # %%
@@ -63,23 +64,31 @@ cat_features = X_train.select_dtypes('object').columns.to_list()
 
 to_drop = selection.DropFeatures(features_to_drop=features_to_drop)
 num_imput = imputation.MeanMedianImputer(
-    imputation_method='mean', variables=num_missing)
+    imputation_method='median', variables=num_missing)
 cat_imput = imputation.CategoricalImputer(
     imputation_method='frequent', variables=cat_missing)
 new_feature = new_feature.NewFeatureAdder()
 perso_name = personal.PersonalTitle()
-onehot = encoding.OneHotEncoder()  # variables=cat_features)
+onehot = encoding.OneHotEncoder(drop_last=True)  # variables=cat_features)
 
 
 # %%
 model = ensemble.RandomForestClassifier(random_state=42)
 
 param = {
-    "max_depth": [4, 8, 10, 15, 50],
-    "min_samples_leaf": [5, 10, 20, 100],
-    "n_estimators": [100, 200, 500]
+    "max_depth": [4, 6, 8, 10],
+    "min_samples_leaf": [2, 5, 10],
+    "n_estimators": [50, 200, 500]
 
 }
+
+# param base_line
+#param = {
+#    "max_depth": [4, 8, 10, 15, 50],
+#    "min_samples_leaf": [5, 10, 20, 100],
+#    "n_estimators": [100, 200, 500]
+#
+#}
 
 grid = model_selection.GridSearchCV(model,
                                     param_grid=param,
@@ -113,7 +122,12 @@ auc_val = metrics.roc_auc_score(df_valid[target], val_pred[:, 1])
 
 print("AUC Score train:", auc_train)
 print("AUC Score test:", auc_test)
-print("AUC Score val:", auc_val)
+print("AUC Score validation:", auc_val)
+
+# best
+#AUC Score train: 0.8655932720379973
+#AUC Score test: 0.8423852957435047
+#AUC Score validation: 0.96875
 
 # %%
 df_test = pd.read_csv(
@@ -125,9 +139,15 @@ df_test.info()
 # %%
 K_test_pred_proba = model_pipe.predict_proba(df_test)
 K_test_pred = model_pipe.predict(df_test)
-
+K_test_pred
 
 # %%
-pernal = personal.PersonalTitle()
-per = pernal.transform(df)
+df_submission = pd.DataFrame()
+df_submission['PassengerId'] = df_test['PassengerId']
+df_submission['Survived'] = pd.DataFrame(K_test_pred)
+df_submission
+
 # %%
+df_submission.to_csv('C:/Git projects/legendary-wingedhorse/Titanic/data/df_submission.csv', index=False)
+
+
