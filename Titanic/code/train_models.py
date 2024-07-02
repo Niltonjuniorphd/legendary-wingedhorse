@@ -17,7 +17,7 @@ df = pd.read_csv('C:/Git projects/legendary-wingedhorse/Titanic/data/train.csv')
 # %%
 #Sample
 target = 'Survived'
-features = df.drop('Survived').columns.tolist()
+features = df.drop('Survived', axis=1).columns.tolist()
 
 df_valid = df.sample(frac=0.02,  random_state=42)
 df_train = df.drop(df_valid.index)
@@ -52,7 +52,7 @@ X_train.isna().sum()
 
 # %%
 
-features_to_drop = ['PassengerId', 'Survived', 'Name']
+features_to_drop = ['PassengerId', 'Name']
 num_missing = ['Age']
 cat_missing = ['Cabin', 'Embarked']
 cat_features = X_train.select_dtypes('object').columns.to_list()
@@ -66,8 +66,8 @@ onehot = encoding.OneHotEncoder() #variables=cat_features)
 model = ensemble.RandomForestClassifier(random_state=42)
 
 param = {
-    "max_depth": [4, 8, 10, 15],
-    "min_samples_leaf": [10, 20, 100],
+    "max_depth": [4, 8, 10, 15, 50],
+    "min_samples_leaf": [5, 10, 20, 100],
     "n_estimators": [100, 200, 500]
 
 }
@@ -95,7 +95,7 @@ model_pipe.fit(X_train, y_train)
 # %%
 train_pred = model_pipe.predict_proba(X_train)
 test_pred = model_pipe.predict_proba(X_test)
-val_pred = model_pipe.predict_proba(df_valid)
+val_pred = model_pipe.predict_proba(df_valid[features])
 
 auc_train = metrics.roc_auc_score(y_train, train_pred[:,1])
 auc_test = metrics.roc_auc_score(y_test, test_pred[:,1])
@@ -114,5 +114,13 @@ df_test.info()
 
 # %%
 
-K_test_pred = model_pipe.predict_proba(df_test)
+K_test_pred_proba = model_pipe.predict_proba(df_test)
+K_test_pred = model_pipe.predict(df_test)
 # %%
+
+# %%
+K_test_pred
+
+# %%
+
+
