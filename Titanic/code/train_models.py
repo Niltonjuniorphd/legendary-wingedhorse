@@ -17,7 +17,7 @@ df = pd.read_csv('C:/Git projects/legendary-wingedhorse/Titanic/data/train.csv')
 # %%
 #Sample
 target = 'Survived'
-features = df.columns.tolist()
+features = df.drop('Survived').columns.tolist()
 
 df_valid = df.sample(frac=0.02,  random_state=42)
 df_train = df.drop(df_valid.index)
@@ -95,14 +95,24 @@ model_pipe.fit(X_train, y_train)
 # %%
 train_pred = model_pipe.predict_proba(X_train)
 test_pred = model_pipe.predict_proba(X_test)
-#oot_pred = model_pipe.predict_proba(df_valid)
+val_pred = model_pipe.predict_proba(df_valid)
 
 auc_train = metrics.roc_auc_score(y_train, train_pred[:,1])
 auc_test = metrics.roc_auc_score(y_test, test_pred[:,1])
-#auc_oot = metrics.roc_auc_score(df_oot[target], oot_pred[:,1])
+auc_val = metrics.roc_auc_score(df_valid[target], val_pred[:,1])
 
 print("AUC Score train:", auc_train)
 print("AUC Score test:", auc_test)
-#print("AUC Score oot:", auc_oot)
+print("AUC Score val:", auc_val)
 
+# %%
+df_test = pd.read_csv('C:/Git projects/legendary-wingedhorse/Titanic/data/test.csv')
+
+# %%
+df_test.info()
+
+
+# %%
+
+K_test_pred = model_pipe.predict_proba(df_test)
 # %%
