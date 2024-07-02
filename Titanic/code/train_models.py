@@ -9,10 +9,13 @@ from feature_engine import selection
 from feature_engine import encoding
 from feature_engine import imputation
 
+from modules import new_feature
+
 
 # %%
 # Data
-df = pd.read_csv('C:/Git projects/legendary-wingedhorse/Titanic/data/train.csv')
+df0 = pd.read_csv('C:/Git projects/legendary-wingedhorse/Titanic/data/train.csv')
+df = df0.copy()
 
 # %%
 #Sample
@@ -60,6 +63,7 @@ cat_features = X_train.select_dtypes('object').columns.to_list()
 to_drop = selection.DropFeatures(features_to_drop=features_to_drop)
 num_imput = imputation.MeanMedianImputer(imputation_method='mean', variables=num_missing)
 cat_imput = imputation.CategoricalImputer(imputation_method='frequent', variables=cat_missing)
+new_feature = new_feature.NewFeatureAdder()
 onehot = encoding.OneHotEncoder() #variables=cat_features)
 
 # %%
@@ -82,6 +86,7 @@ model_pipe = pipeline.Pipeline([
     ('to_drop', to_drop),
     ('num_imput', num_imput),
     ('cat_imput', cat_imput),
+    ('new_feature', new_feature),
     ('onehot', onehot),
     ('model', grid)
 ])
@@ -122,5 +127,5 @@ K_test_pred = model_pipe.predict(df_test)
 K_test_pred
 
 # %%
-
-
+new_return_test = new_feature.transform(X_train)
+# %%
