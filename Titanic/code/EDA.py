@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import ks_2samp
 
+
 def is_equal(df, feature):
     '''
     Tests if the distributions of the specified feature for the survived and not-survived groups are equal 
@@ -20,7 +21,7 @@ def is_equal(df, feature):
     Prints:
     A message indicating the null hypothesis, the p-value, and the result of the hypothesis test 
     (whether the distributions are different or not at a significance level of 1%).
-    
+
     '''
     sns.kdeplot(df[df['Survived'] == 0][feature], label='not survived')
     sns.kdeplot(df[df['Survived'] == 1][feature], label='survived')
@@ -45,9 +46,11 @@ def is_equal(df, feature):
         print("The distributions are not different (fail to reject the null hypothesis).")
 
 
-
 # %%
-df = pd.read_csv('C:/Git projects/legendary-wingedhorse/Titanic/data/train.csv')
+df0 = pd.read_csv(
+    'C:/Git projects/legendary-wingedhorse/Titanic/data/train.csv')
+
+df = df0.copy()
 
 # %%
 # Describe the status of data. Is there any missing data, if so in which columns?
@@ -56,11 +59,21 @@ print('\n')
 print(df.isnull().sum())
 
 # %%
-#What is the overall survival rate ?
+# What is the overall survival rate ?
 df['Survived'].mean()
 
 # %%
-#How is survival rate different for Females and Males?
+df['Sib_Par'] = df.apply(lambda row: f"{row['SibSp']},{row['Parch']}", axis=1)
+
+df['surnames'] = pd.Series([df['Name'].apply(lambda x: x.split(' '))[i][1] for i in df.index])
+
+# %%
+personal_names = pd.Series([df['Name'].apply(lambda x: x.split(','))[i][1] for i in df.index], index=df.index)
+df['personal_names'] = pd.Series([personal_names.apply(lambda x: x.split())[i][0] for i in personal_names.index])
+
+
+# %%
+# How is survival rate different for Females and Males?
 df.groupby('Sex')['Survived'].mean()
 
 # %%
@@ -86,10 +99,7 @@ is_equal(df, 'Age')
 is_equal(df, 'Fare')
 
 # %%
-
-
-# %%
-#hb_plot is a module
+# hb_plot is a module
 EDA_module.hb_plot(df, 'Age')
 
 # %%
@@ -100,37 +110,35 @@ EDA_module.deep_hb_plot(df2)
 sns.barplot(df, x="SibSp", y="Survived", hue="Sex")
 
 # %%
+sns.barplot(df, x="Sib_Par", y="Survived")
+
+# %%
 df.groupby(['SibSp'])['Survived'].agg(['count', 'sum', 'mean'])
 
 # %%
 df.groupby(['Parch'])['Survived'].agg(['count', 'sum', 'mean'])
 
 # %%
-df.groupby(df[df['Survived']==1]['Parch'])['Survived'].agg(['count', 'sum', 'mean'])
+df.groupby(['Sib_Par'])['Survived'].agg(['count', 'sum', 'mean'])
 
 # %%
-sns.countplot(data=df, x="SibSp", hue='Sex') #, y="Sex", hue="Sex")
+df.groupby(df[df['Survived'] == 1]['Parch'])[
+    'Survived'].agg(['count', 'sum', 'mean'])
 
 # %%
-
-sns.countplot(data=df, x="Parch", hue='Sex') #, y="Sex", hue="Sex")
-
-# %%
-df['Name']
+sns.countplot(data=df, x="SibSp", hue='Sex')  # , y="Sex", hue="Sex")
 
 # %%
-surnames = pd.Series([df['Name'].apply(lambda x: x.split(','))[i][0] for i in range(len(df['Name']))])
-surnames 
+sns.countplot(data=df, x="Parch", hue='Sex')  # , y="Sex", hue="Sex")
 
 # %%
-surnames.value_counts()
+sns.countplot(data=df, x="Sib_Par", hue='Sex')  # , y="Sex", hue="Sex")
 
 # %%
-surnames.value_counts().value_counts().sort_index()
+df.groupby(by=['Sib_Par']).agg({'Survived': ['count','mean'], 'Age': ['count','mean', 'min', 'max']})
 
 # %%
-surnames.nunique()
+df.groupby(by=['personal_names', 'Sib_Par']).agg({'Survived': ['count','mean'], 'Age': ['count','mean', 'min', 'max']}).head(20)
 
-# %%
-pd.Series(list(zip(df['SibSp'], df['Parch']))).value_counts()
+
 # %%
