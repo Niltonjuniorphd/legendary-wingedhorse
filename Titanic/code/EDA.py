@@ -67,10 +67,10 @@ df['Sib_Par'] = df.apply(lambda row: f"{row['SibSp']},{row['Parch']}", axis=1)
 
 df['surnames'] = pd.Series([df['Name'].apply(lambda x: x.split(' '))[i][1] for i in df.index])
 
-# %%
 personal_names = pd.Series([df['Name'].apply(lambda x: x.split(','))[i][1] for i in df.index], index=df.index)
 df['personal_names'] = pd.Series([personal_names.apply(lambda x: x.split())[i][0] for i in personal_names.index])
 
+df['sum_Sib_Par'] = df.apply(lambda row: row['SibSp'] + row['Parch'], axis=1)
 
 # %%
 # How is survival rate different for Females and Males?
@@ -135,10 +135,10 @@ sns.countplot(data=df, x="Parch", hue='Sex')  # , y="Sex", hue="Sex")
 sns.countplot(data=df, x="Sib_Par", hue='Sex')  # , y="Sex", hue="Sex")
 
 # %%
-df.groupby(by=['Sib_Par']).agg({'Survived': ['count','mean'], 'Age': ['count','mean', 'min', 'max']})
+df.groupby(by=['Sib_Par'], dropna=False).agg({'Survived': ['count','mean'], 'Age': ['count','mean', 'min', 'max']})
 
 # %%
-df.groupby(by=['personal_names', 'Sib_Par']).agg({'Survived': ['count','mean'], 'Age': ['count','mean', 'min', 'max']}).head(20)
+df.groupby(by=['personal_names', 'Sib_Par', 'sum_Sib_Par'], dropna=False).agg({'Survived': ['count','mean'], 'Age': ['count','mean', 'min', 'max']}).head(50)
 
 
 # %%
