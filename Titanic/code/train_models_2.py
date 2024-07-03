@@ -11,6 +11,7 @@ from feature_engine import imputation
 
 from modules import new_feature
 from modules import personal
+from modules import changeType
 
 # %%
 # Data
@@ -20,11 +21,7 @@ df0['Pclass'] = df0['Pclass'].astype('object')
 df = df0.copy()
 
 # %%
-#df['Sib_Par'] = df.apply(lambda row: f"{row['SibSp']},{row['Parch']}", axis=1)
-#df['surnames'] = pd.Series([df['Name'].apply(lambda x: x.split(' '))[i][1] for i in df.index])
-#personal_names = pd.Series([df['Name'].apply(lambda x: x.split(','))[i][1] for i in df.index], index=df.index)
-#df['personal_names'] = pd.Series([personal_names.apply(lambda x: x.split())[i][0] for i in personal_names.index])
-#df['sum_Sib_Par'] = df.apply(lambda row: row['SibSp'] + row['Parch'], axis=1)
+df = df.dropna(subset='Embarked', axis=0)
 
 # %%
 # Sample
@@ -64,7 +61,7 @@ X_train.isna().sum()
 
 # %%
 
-features_to_drop = ['PassengerId', 'Name', 'Ticket', 'Age', 'Cabin']
+features_to_drop = ['PassengerId', 'Name', 'Ticket', 'Cabin'] #, 'Age'
 num_missing = ['Age']
 cat_missing = ['Embarked']
 cat_features = X_train.select_dtypes('object').columns.to_list()
@@ -76,17 +73,28 @@ cat_imput = imputation.CategoricalImputer(
     imputation_method='frequent', variables=cat_missing)
 new_feature = new_feature.NewFeatureAdder()
 perso_name = personal.PersonalTitle()
-onehot = encoding.OneHotEncoder(drop_last=True)  # variables=cat_features)
+onehot = encoding.OneHotEncoder()  # variables=cat_features)
+change1 = changeType.ChangeType(column='SibSp')
+change2 = changeType.ChangeType(column='Parch')
 
 
 # %%
-model = ensemble.RandomForestClassifier(random_state=42)
+#model = ensemble.RandomForestClassifier(random_state=42)
+model = ensemble.GradientBoostingClassifier(random_state=42)
 
-param = {
+paramRF = {
     "max_depth": [4, 6, 8, 10],
     "min_samples_leaf": [2, 5, 10],
     "n_estimators": [50, 200, 500]
 
+}
+
+paramGB = {
+    'learning_rate': [0.01, 0.1, 0.2, 0.3],
+    'n_estimators': [50, 100, 200, 300],
+    'subsample': [0.6, 0.8, 1.0],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
 }
 
 # param base_line
@@ -98,7 +106,7 @@ param = {
 #}
 
 grid = model_selection.GridSearchCV(model,
-                                    param_grid=param,
+                                    param_grid=paramGB,
                                     scoring='roc_auc',
                                     cv=3,
                                     n_jobs=-1)
@@ -106,12 +114,27 @@ grid = model_selection.GridSearchCV(model,
 model_pipe = pipeline.Pipeline([
     #('perso_name', perso_name),
     ('new_feature', new_feature),
+    #('changeTYpe1', change1),
+    ('changeTYpe2', change2),
     ('to_drop', to_drop),
-    #('num_imput', num_imput),
-    ('cat_imput', cat_imput),
+    ('num_imput', num_imput),
+    #('cat_imput', cat_imput),
     ('onehot', onehot),
     ('model', grid)
 ])
+
+# %%
+model_pipe_df = pipeline.Pipeline([
+    #('perso_name', perso_name),
+    ('new_feature', new_feature),
+    #('changeTYpe1', change1),
+    ('changeTYpe2', change2),
+    ('to_drop', to_drop),
+    ('num_imput', num_imput),
+    #('cat_imput', cat_imput),
+    ('onehot', onehot)])
+
+df_pipe = model_pipe_df.fit_transform(X_train)
 
 
 # %%
@@ -135,6 +158,10 @@ print("AUC Score validation:", auc_val)
 #AUC Score train: 0.8655932720379973
 #AUC Score test: 0.8423852957435047
 #AUC Score validation: 0.96875
+
+#AUC Score train: 0.9038730547298479
+#AUC Score test: 0.839690436705362
+#AUC Score validation: 0.8766233766233766
 
 # %%
 df_test = pd.read_csv(

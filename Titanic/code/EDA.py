@@ -142,3 +142,6 @@ df.groupby(by=['personal_names', 'Sib_Par', 'sum_Sib_Par'], dropna=False).agg({'
 
 
 # %%
+df.groupby(by=['Embarked'], dropna=False).agg({'Survived': ['count','mean'], 'Fare': ['count','mean', 'min', 'max']})
+
+# %%
