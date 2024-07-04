@@ -10,7 +10,6 @@ from feature_engine import encoding
 from feature_engine import imputation
 
 from modules import new_feature
-from modules import personal
 from modules import changeType
 
 # %%
@@ -59,24 +58,6 @@ print('\n')
 print('explore NaNs')
 X_train.isna().sum()
 
-# %%
-
-features_to_drop = ['PassengerId', 'Name', 'Ticket', 'Cabin'] #, 'Age'
-num_missing = ['Age']
-cat_missing = ['Embarked']
-cat_features = X_train.select_dtypes('object').columns.to_list()
-
-to_drop = selection.DropFeatures(features_to_drop=features_to_drop)
-num_imput = imputation.MeanMedianImputer(
-    imputation_method='median', variables=num_missing)
-cat_imput = imputation.CategoricalImputer(
-    imputation_method='frequent', variables=cat_missing)
-new_feature = new_feature.NewFeatureAdder()
-perso_name = personal.PersonalTitle()
-onehot = encoding.OneHotEncoder()  # variables=cat_features)
-change1 = changeType.ChangeType(column='SibSp')
-change2 = changeType.ChangeType(column='Parch')
-
 
 # %%
 #model = ensemble.RandomForestClassifier(random_state=42)
@@ -92,9 +73,9 @@ paramRF = {
 paramGB = {
     'learning_rate': [0.01, 0.1, 0.2, 0.3],
     'n_estimators': [50, 100, 200, 300],
-    'subsample': [0.6, 0.8, 1.0],
+    'subsample': [0.5, 0.8, 1.0],
     'min_samples_split': [2, 5, 10],
-    'min_samples_leaf': [1, 2, 4]
+    'min_samples_leaf': [2, 5, 10],
 }
 
 # param base_line
@@ -111,28 +92,38 @@ grid = model_selection.GridSearchCV(model,
                                     cv=3,
                                     n_jobs=-1)
 
+catinput = imputation.CategoricalImputer(ignore_format=False)
+numinput = imputation.MeanMedianImputer(imputation_method='mean')
+new_feature = new_feature.NewFeatureAdder()
+change1 = changeType.ChangeType(column='SibSp')
+change2 = changeType.ChangeType(column='Parch')
+change3 = changeType.ChangeType(column='sum_Sib_Par')
+to_drop = selection.DropFeatures(features_to_drop= ['PassengerId', 'Name', 'Ticket', 'Cabin'])
+onehot = encoding.OneHotEncoder()  
+
 model_pipe = pipeline.Pipeline([
-    #('perso_name', perso_name),
+    ('catinput', catinput),
+    ('numinput', numinput),
     ('new_feature', new_feature),
     #('changeTYpe1', change1),
     ('changeTYpe2', change2),
+    ('changeTYpe3', change3),
     ('to_drop', to_drop),
-    ('num_imput', num_imput),
-    #('cat_imput', cat_imput),
     ('onehot', onehot),
     ('model', grid)
 ])
 
 # %%
 model_pipe_df = pipeline.Pipeline([
-    #('perso_name', perso_name),
+    ('catinput', catinput),
+    ('numinput', numinput),
     ('new_feature', new_feature),
     #('changeTYpe1', change1),
     ('changeTYpe2', change2),
+    ('changeTYpe3', change3),
     ('to_drop', to_drop),
-    ('num_imput', num_imput),
-    #('cat_imput', cat_imput),
-    ('onehot', onehot)])
+    ('onehot', onehot),
+])
 
 df_pipe = model_pipe_df.fit_transform(X_train)
 
@@ -162,6 +153,16 @@ print("AUC Score validation:", auc_val)
 #AUC Score train: 0.9038730547298479
 #AUC Score test: 0.839690436705362
 #AUC Score validation: 0.8766233766233766
+
+#GB
+#AUC Score train: 0.9575668823220844
+#AUC Score test: 0.8287728026533996
+#AUC Score validation: 0.935064935064935
+
+#GB mean
+#AUC Score train: 0.955984437838783
+#AUC Score test: 0.8345771144278606
+#AUC Score validation: 0.8701298701298701
 
 # %%
 df_test = pd.read_csv(
