@@ -44,7 +44,7 @@ print(f'response rate df_train  = {df_train['Survived'].mean()}')
 # Sample split
 X_train, X_test, y_train, y_test = model_selection.train_test_split(
     df_train[features], df_train[target],
-    train_size=0.8,
+    train_size=0.80,
     random_state=42,
     stratify=df_train[target])
 
@@ -60,8 +60,8 @@ X_train.isna().sum()
 
 
 # %%
-#model = ensemble.RandomForestClassifier(random_state=42)
-model = ensemble.GradientBoostingClassifier(random_state=42)
+model = ensemble.RandomForestClassifier(random_state=42)
+#model = ensemble.GradientBoostingClassifier(random_state=42)
 
 paramRF = {
     "max_depth": [4, 6, 8, 10],
@@ -87,18 +87,25 @@ paramGB = {
 #}
 
 grid = model_selection.GridSearchCV(model,
-                                    param_grid=paramGB,
+                                    param_grid=paramRF,
                                     scoring='roc_auc',
                                     cv=3,
                                     n_jobs=-1)
 
 catinput = imputation.CategoricalImputer(ignore_format=False)
-numinput = imputation.MeanMedianImputer(imputation_method='mean')
+numinput = imputation.MeanMedianImputer(imputation_method='median')
 new_feature = new_feature.NewFeatureAdder()
 change1 = changeType.ChangeType(column='SibSp')
 change2 = changeType.ChangeType(column='Parch')
 change3 = changeType.ChangeType(column='sum_Sib_Par')
-to_drop = selection.DropFeatures(features_to_drop= ['PassengerId', 'Name', 'Ticket', 'Cabin'])
+to_drop = selection.DropFeatures(features_to_drop=
+                                 ['PassengerId',
+                                  'Name',
+                                  'Ticket',
+                                  'Cabin',
+                                  'SibSp',
+                                  'Sib_Par',
+                                  ])
 onehot = encoding.OneHotEncoder()  
 
 model_pipe = pipeline.Pipeline([
@@ -145,15 +152,6 @@ print("AUC Score train:", auc_train)
 print("AUC Score test:", auc_test)
 print("AUC Score validation:", auc_val)
 
-# best
-#AUC Score train: 0.8655932720379973
-#AUC Score test: 0.8423852957435047
-#AUC Score validation: 0.96875
-
-#AUC Score train: 0.9038730547298479
-#AUC Score test: 0.839690436705362
-#AUC Score validation: 0.8766233766233766
-
 #GB
 #AUC Score train: 0.9575668823220844
 #AUC Score test: 0.8287728026533996
@@ -163,6 +161,16 @@ print("AUC Score validation:", auc_val)
 #AUC Score train: 0.955984437838783
 #AUC Score test: 0.8345771144278606
 #AUC Score validation: 0.8701298701298701
+
+#RF mean
+#AUC Score train: 0.9298391327155097
+#AUC Score test: 0.8432835820895522
+#AUC Score validation: 0.9090909090909091
+
+#RF drop ['PassengerId', 'Name','Ticket','Cabin','SibSp','Sib_Par'])
+#AUC Score train: 0.9329078510229061
+#AUC Score test: 0.8206882255389718
+#AUC Score validation: 0.948051948051948
 
 # %%
 df_test = pd.read_csv(
