@@ -10,4 +10,4 @@ The provided code showcases the instantiation and manipulation of objects from t
 - Invoking various methods from both classes.
 - Managing a list of objects and iterating through them to print their attributes.
 
-## --> run the testRun.py to see it working
+## --> run the testRun.py file to see all working
