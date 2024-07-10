@@ -34,7 +34,7 @@ def is_equal(df, feature):
     # Kolmogorov-Smirnov Test
     ks_statistic, p_value = ks_2samp(age_not_survived, age_survived)
 
-    print('The distributions of the two samples are identical.')
+    print('H0: The distributions of the two samples are identical.')
 
     if p_value < 0.01:
         print(f'p-value = {p_value}')
