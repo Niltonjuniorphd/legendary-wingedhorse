@@ -35,8 +35,8 @@ for page in range(1,11,1):
         journal = noticia.find('div', attrs={'class': 'widget--info__meta--card'})
         if journal:
             #print('journal:', journal.text)
-            name.append(journal.text.split('\n')[1])
-            date.append(journal.text.split('\n')[3])
+            name.append(journal.text.split('/n')[1])
+            date.append(journal.text.split('/n')[3])
         else:
             name.append('sem name')
             date.append('sem date')
@@ -44,14 +44,14 @@ for page in range(1,11,1):
         title = noticia.find('div', attrs={'class': 'widget--info__title product-color'})
         if title:
             #print('title:', title.text)
-            title_text.append(title.text.replace('\n ', '').strip())
+            title_text.append(title.text.replace('/n ', '').strip())
         else:
             title_text.append('sem title')
     
         content = noticia.find('p', attrs={'class': 'widget--info__description'})
         if content:
             #print('title:', title.text)
-            content_text.append(content.text.replace('\n ', '').strip())
+            content_text.append(content.text.replace('/n ', '').strip())
         else:
             content_text.append('sem content')
 
@@ -111,7 +111,7 @@ word_key_list = [
                  'não-letais',
                  ]
 
-for i, j in enumerate(df['title_text']):
+for i, j in enumerate(df['content_text']):
     for p in word_key_list:
         if p in j.lower():
             df.loc[i, p] = 1
@@ -122,7 +122,7 @@ df.info()
 df.select_dtypes('number').sum()
 
 # %%
-df.to_csv('C:\Git projects\legendary-wingedhorse\WebScraping\data.csv')
+df.to_csv('C:/Git projects/legendary-wingedhorse/WebScraping/data.csv')
 
 # %%
 df[(df['guarda'] == 1) & (df['morto'] == 1) ]
