@@ -7,7 +7,6 @@ import webbrowser
 
 
 # %%
-
 name = []
 date = []
 title_text = []
@@ -123,7 +122,7 @@ df.info()
 df.select_dtypes('number').sum()
 
 # %%
-df.to_csv('data.csv')
+df.to_csv('C:\Git projects\legendary-wingedhorse\WebScraping\data.csv')
 
 # %%
 df[(df['guarda'] == 1) & (df['morto'] == 1) ]
