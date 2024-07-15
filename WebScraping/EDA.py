@@ -3,8 +3,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import datetime as dt
+import webbrowser
 
-df0 = pd.read_csv('C:/Git projects/legendary-wingedhorse/WebScraping/data.csv')
+df0 = pd.read_csv('C:/Git projects/legendary-wingedhorse/WebScraping/data_b.csv')
 df0 = df0.drop(['Unnamed: 0', 'index'], axis = 1)
 df = df0.copy()
 # %%
@@ -20,6 +21,7 @@ sns.barplot(data=df, y='condor', x='year', hue='condor')
 df.select_dtypes('number').sum()
 
 # %%
-df.groupby('year')[['condor', 'não_letal_G', 'morte', 'mortos', 'morreu', 'feriu']].sum()
+df.groupby('year')[['condor', 'não_letal_G', 'morte', 'mortos', 'morreu', 'feriu', 'bala']].sum()
 
 # %%
+webbrowser.open(df[(df['year'] == 2024) & (df['morreu'] == 1)].loc[18, 'link'])

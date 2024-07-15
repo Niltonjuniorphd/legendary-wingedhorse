@@ -11,9 +11,7 @@ name = []
 date = []
 title_text = []
 content_text = []
-
-dt_start = '2020-01-01' 
-dt_end = '2024-01-01'
+link_text = []
 
 hard_key = 'armas+não+letais'
 
@@ -43,17 +41,21 @@ for page in range(1,11,1):
         
         title = noticia.find('div', attrs={'class': 'widget--info__title product-color'})
         if title:
-            #print('title:', title.text)
             title_text.append(title.text.replace('\n ', '').strip())
         else:
             title_text.append('sem title')
     
         content = noticia.find('p', attrs={'class': 'widget--info__description'})
         if content:
-            #print('title:', title.text)
             content_text.append(content.text.replace('\n ', '').strip())
         else:
             content_text.append('sem content')
+
+        link = noticia.find('a', attrs={'class': 'widget--info__media'})
+        if link:
+            link_text.append(link['href'])
+        else:
+            link_text.append('sem link')
 
 
 
@@ -64,7 +66,7 @@ for page in range(1,11,1):
         #print('---')
 
 # %%
-df0 = pd.DataFrame({'date': date, 'name': name, 'title_text': title_text, 'content_text': content_text})
+df0 = pd.DataFrame({'date': date, 'name': name, 'title_text': title_text, 'content_text': content_text, 'link': link_text})
 df0.info()
 
 # %%
@@ -122,7 +124,7 @@ df.info()
 df.select_dtypes('number').sum()
 
 # %%
-df.to_csv('C:/Git projects/legendary-wingedhorse/WebScraping/data.csv')
+df.to_csv('C:/Git projects/legendary-wingedhorse/WebScraping/data_b.csv')
 
 # %%
 df[(df['guarda'] == 1) & (df['morto'] == 1) ]
