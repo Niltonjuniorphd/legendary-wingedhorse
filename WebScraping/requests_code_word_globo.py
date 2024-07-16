@@ -18,7 +18,6 @@ hard_key = 'armas+não+letais'
 for page in range(1,11,1):
     noticias = []
 
-    #when = f'https://www.globo.com/busca/?q=condor+não+letal&order=recent&from={dt_start}T00%3A00%3A00-0300&to={dt_end}T23%3A59%3A59-0300&page={i}'
     when = f'https://www.globo.com/busca/?q="{hard_key}"&from=now-5y&page={page}'
     response = requests.get(when)
 
@@ -124,8 +123,8 @@ df.info()
 df.select_dtypes('number').sum()
 
 # %%
-
-df.to_csv('C:/Git projects/legendary-wingedhorse/WebScraping/data_b.csv')
+h = pd.Timestamp.today()
+df.to_csv(f'C:/Git projects/legendary-wingedhorse/WebScraping/data_{h}.csv')
 
 # %%
 df[(df['guarda'] == 1) & (df['morto'] == 1) ]
