@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import datetime as dt
 import webbrowser
 
-df0 = pd.read_csv('data_2024-07-16_munição_não_letal.csv')
+df0 = pd.read_csv('C:\Git projects\legendary-wingedhorse\WebScraping\data_2024-07-16_munição_não_letal.csv')
 df0 = df0.drop(['Unnamed: 0', 'index'], axis = 1)
 df = df0.copy()
 
