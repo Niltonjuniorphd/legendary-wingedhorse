@@ -124,6 +124,7 @@ df.info()
 df.select_dtypes('number').sum()
 
 # %%
+
 df.to_csv('C:/Git projects/legendary-wingedhorse/WebScraping/data_b.csv')
 
 # %%
