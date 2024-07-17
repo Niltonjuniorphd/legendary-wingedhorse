@@ -123,3 +123,6 @@ plt.show()
 
 # %%
 df_group.to_csv('data_group_munição_não_letal.csv')
+
+# %%
+print(df[df['disparo'] == 1][['date_b', 'title_text']])
