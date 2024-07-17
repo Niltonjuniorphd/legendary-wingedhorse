@@ -1,12 +1,7 @@
-# %%
 import requests
 from bs4 import BeautifulSoup
-
 import pandas as pd
-import webbrowser
 
-
-# %%
 name = []
 date = []
 title_text = []
@@ -58,42 +53,11 @@ for page in range(1,11,1):
         else:
             link_text.append('sem link')
 
-
-
-        #text_content = noticia.find('p', attrs={'class': 'widget--info__description'})
-        #if text_content:
-        #    print('text_content:', text_content.text)
-        
-        #print('---')
-
-# %%
 df0 = pd.DataFrame({'date': date, 'name': name, 'title_text': title_text, 'content_text': content_text, 'link': link_text})
-df0.info()
-
-# %%
 df = df0.copy()
+df = df.drop_duplicates()
+df.info()
 
-for i, j in enumerate(df['date']):
-    df.loc[i, 'date_b'] = pd.to_datetime(j.replace('às', '')
-                                         .replace('à', '')
-                                         .replace('mai', 'may')
-                                         .replace('out', 'oct')
-                                         .replace('set', 'sep')
-                                         .replace('dez', 'dec')
-                                         .replace('º','')
-                                         .replace('ago', 'aug')
-                                         .replace('abr', 'apr')
-                                         .replace('fev', 'feb'), dayfirst=True).date()
-
-#df['date'] = pd.to_datetime(df['date'])
-
-# %%
-df = df.sort_values(by=['date_b'], ascending=False)
-df = df.reset_index()
-
-# %%
 h = pd.Timestamp.today()
-df.to_csv(f'C:/Git projects/legendary-wingedhorse/WebScraping/data_{h.date()}_{hard_key.replace('"','').replace(' ', '_')}.csv')
-
-# %%
-df0
+df.to_csv(f'data_{h.date()}_{hard_key.replace('"','').replace(' ', '_')}.csv')
+print('\n Quantidade de notícias encontradas: ',len(df))

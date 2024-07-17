@@ -5,10 +5,28 @@ import matplotlib.pyplot as plt
 import datetime as dt
 import webbrowser
 
-df0 = pd.read_csv('C:\Git projects\legendary-wingedhorse\WebScraping\data_2024-07-16_munição_não_letal.csv')
-df0 = df0.drop(['Unnamed: 0', 'index'], axis = 1)
+df0 = pd.read_csv('data_2024-07-17_munição_não_letal.csv')
+df0 = df0.drop(['Unnamed: 0'], axis = 1)
 df = df0.copy()
 
+# %%
+for i, j in enumerate(df['date']):
+    df.loc[i, 'date_b'] = pd.to_datetime(j.replace('às', '')
+                                         .replace('à', '')
+                                         .replace('mai', 'may')
+                                         .replace('out', 'oct')
+                                         .replace('set', 'sep')
+                                         .replace('dez', 'dec')
+                                         .replace('º','')
+                                         .replace('ago', 'aug')
+                                         .replace('abr', 'apr')
+                                         .replace('fev', 'feb'), dayfirst=True).date()
+
+#df['date'] = pd.to_datetime(df['date'])
+
+# %%
+df = df.sort_values(by=['date_b'], ascending=False)
+df = df.reset_index()
 
 # %%
 df.info()
@@ -34,6 +52,7 @@ text_key_list = [
                  'borracha',
                  'granada',
                  'lacrimogêneo',
+                 'spray',
                  ]
 
 for i, j in enumerate(df['content_text']):
@@ -74,7 +93,8 @@ df_group = df.groupby('year')[['condor_t',
                     'munição',
                     'granada',
                     'disparo',
-                    'lacrimogêneo']].sum().astype('int')
+                    'lacrimogêneo',
+                    'spray']].sum().astype('int')
 df_group
 
 # %%
@@ -94,10 +114,6 @@ plt.show()
 ax = sns.barplot(data=df_group, x='year', y='condor', color='red')
 ax.bar_label(ax.containers[0], fontsize=10)
 plt.show()
-
-# %%
-#sns.lineplot(data=df_group, x='year', y='condor', color='red')
-#plt.show()
 
 # %%
 ax = sns.barplot(data=df, x='year', y='condor', color='red', errorbar=None)
