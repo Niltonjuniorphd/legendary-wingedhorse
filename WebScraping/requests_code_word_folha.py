@@ -1,6 +1,11 @@
+# %%
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+}
 
 name = []
 date = []
@@ -8,14 +13,14 @@ title_text = []
 content_text = []
 link_text = []
 
-hard_key = '"munição não letal"'
+hard_key = '"bala de borracha"'
 
-for page in range(1,11,1):
+for page in range(1,201,25):
     noticias = []
 
     when = f'https://search.folha.uol.com.br/?q={hard_key}&site=todos&sr={page}'
 
-    response = requests.get(when)
+    response = requests.get(when, headers=headers)
 
     content = response.content
     site = BeautifulSoup(content, 'html.parser')
@@ -60,4 +65,6 @@ df.info()
 
 h = pd.Timestamp.today()
 df.to_csv(f'data_{h.date()}_{hard_key.replace('"','').replace(' ', '_')}.csv')
-print('\n Quantidade de notícias encontradas: ',len(df))
+print('\n Quantidade de notícias encontradas: ',len(df0))
+print('\n Quantidade de notícias duplicadas: ',df0.duplicated().sum())
+print('\n Quantidade de notícias consideradas: ',len(df))
