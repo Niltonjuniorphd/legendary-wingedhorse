@@ -97,6 +97,7 @@ df_group = df.groupby('year')[['condor_t',
                     'disparo',
                     'lacrimogêneo',
                     'spray']].sum().astype('int')
+df_group.to_csv('df_group.csv')
 df_group
 
 df_group_day = df.groupby('day')[['condor_t',
@@ -161,3 +162,48 @@ plt.show()
 
 # %%
 print(df[df['disparo'] == 1][['date_b', 'title_text']])
+
+# %%
+fig, ax = plt.subplots(figsize=(10, 3))
+
+ax.xaxis.set_visible(False)
+ax.yaxis.set_visible(False)
+ax.set_frame_on(False)
+
+table = ax.table(cellText=df_group.values, colLabels=df_group.columns, cellLoc='center', loc='center')
+table.auto_set_font_size(False)
+table.set_fontsize(6)
+plt.show()
+
+plt.savefig('dataframe_table.png', bbox_inches='tight', pad_inches=0.5)
+
+plt.close()
+
+# %%
+fig, ax = plt.subplots()
+
+ax.xaxis.set_visible(False)
+ax.yaxis.set_visible(False)
+ax.set_frame_on(False)
+
+ax.text(0.05, 0.9, f'a quantidade total de notícias é de {len(df)}', fontsize=12)
+ax.text(0.05, 0.7, f'notícias com morte:', fontsize=12)
+
+l =0.6
+for i in df[df['morte_G']==1][['date','title_text']].index:
+    ax.text(0.05, l, f'{df[df['morte_G']==1]['date_b'].loc[i]} - {df[df['morte_G']==1]['title_text'].loc[i]}', fontsize=12)
+    l -= 0.1
+
+ax.text(0.05, l-0.1, f'notícias com lacrimogêneo:', fontsize=12)
+
+l = l - 0.2
+for i in df[df['lacrimogêneo']==1][['date','title_text']].index:
+    ax.text(0.05, l, f'{df[df['lacrimogêneo']==1]['date_b'].loc[i]} - {df[df['lacrimogêneo']==1]['title_text'].loc[i]}', fontsize=12)
+    l -= 0.1
+
+plt.savefig('fig_noticias.png', bbox_inches='tight', pad_inches=0.5)
+
+
+
+# %%
+[df[df['morte_G']==1][['date', 'title_text']].loc[i] for i in df[df['morte_G']==1][['date', 'title_text']].index]
