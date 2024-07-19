@@ -135,16 +135,19 @@ df.select_dtypes('number').sum()
 # %%
 ax = sns.barplot(x=df['year'].value_counts().index, y=df['year'].value_counts().values, color='red')
 ax.bar_label(ax.containers[0], fontsize=10)
+plt.savefig('fig_year.png')
 plt.show()
 
 # %%
 ax = sns.barplot(x=df['month'].value_counts().index, y=df['month'].value_counts().values, color='red')
 ax.bar_label(ax.containers[0], fontsize=10)
+plt.savefig('fig_month.png')
 plt.show()
 
 # %%
 ax = sns.barplot(data=df_group, x='year', y='condor', color='red')
 ax.bar_label(ax.containers[0], fontsize=10)
+plt.savefig('fig_condor.png')
 plt.show()
 
 # %%
@@ -154,7 +157,7 @@ for container in ax.containers:
 plt.show()
 
 # %%
-df_group.to_csv('data_group_bala_de_borracha.csv')
+#df_group.to_csv('data_group_bala_de_borracha.csv')
 
 # %%
 print(df[df['disparo'] == 1][['date_b', 'title_text']])
