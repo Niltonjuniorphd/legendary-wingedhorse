@@ -13,7 +13,7 @@ title_text = []
 content_text = []
 link_text = []
 
-hard_key = '"bala de borracha"'
+hard_key = '"ações da petrobras"'
 
 for page in range(1,201,25):
     noticias = []
