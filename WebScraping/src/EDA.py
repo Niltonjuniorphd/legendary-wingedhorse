@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import datetime as dt
 import webbrowser
 
-df0 = pd.read_csv('data_2024-07-19_bala_de_borracha.csv')
+df0 = pd.read_csv('data_2024-07-22_bala_de_borracha.csv')
 df0 = df0.drop(['Unnamed: 0'], axis = 1)
 df = df0.copy()
 
