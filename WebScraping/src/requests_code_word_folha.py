@@ -1,15 +1,14 @@
-#%%
+
 import requests
 import pandas as pd
 
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
-#%%
-hard_key = '"venezuela"'
 
-def get_news(hard_key):
+# hard_key = '"venezuela"'
 
+def get_news(hard_key=input('type the hard_key: ')):
     print(f'\nHard_key used to scrap: {hard_key}')
     print(f'\nDate: {pd.Timestamp.today().date()}')
 
@@ -19,24 +18,26 @@ def get_news(hard_key):
 
     noticias_t = []
 
-    #hard_key = '"venezuela"'
+    # hard_key = '"venezuela"'
 
     print(f'\n searching for {hard_key} ...\n')
 
-    for page in tqdm(range(1,201,25), bar_format='{desc:<5.5}{percentage:3.0f}%|{bar:20}{r_bar}'):
+    for page in tqdm(range(1, 201, 25), bar_format='{desc:<5.5}{percentage:3.0f}%|{bar:20}{r_bar}'):
         noticias = []
 
-        when = f'https://search.folha.uol.com.br/?q={hard_key}&site=todos&sr={page}'
+        when = f'https://search.folha.uol.com.br/?q={
+            hard_key}&site=todos&sr={page}'
 
         response = requests.get(when, headers=headers)
 
         content = response.content
         site = BeautifulSoup(content, 'html.parser')
 
-        #noticias = site.find_all('li', attrs={'class': 'c-headline c-headline--newslist'})
-        noticias_t.append(site.find_all('li', attrs={'class': 'c-headline c-headline--newslist'}))
-    
-    return noticias_t
+        # noticias = site.find_all('li', attrs={'class': 'c-headline c-headline--newslist'})
+        noticias_t.append(site.find_all(
+            'li', attrs={'class': 'c-headline c-headline--newslist'}))
+
+    return noticias_t, hard_key
 
 
 def create_result_table(news):
@@ -49,7 +50,8 @@ def create_result_table(news):
 
     for i, j in enumerate(news):
         for noticia in j:
-            journal = noticia.find('h3', attrs={'class': 'c-headline__kicker c-kicker c-search__result_h3'})
+            journal = noticia.find(
+                'h3', attrs={'class': 'c-headline__kicker c-kicker c-search__result_h3'})
             if journal:
                 name.append(journal.text.replace('/n ', '').strip())
             else:
@@ -60,14 +62,15 @@ def create_result_table(news):
                 date.append(noticia_date.text.replace('/n ', '').strip())
             else:
                 date.append('sem date')
-            
+
             title = noticia.find('h2', attrs={'class': 'c-headline__title'})
             if title:
                 title_text.append(title.text.replace('/n ', '').strip())
             else:
                 title_text.append('sem title')
-        
-            content = noticia.find('p', attrs={'class': 'c-headline__standfirst'})
+
+            content = noticia.find(
+                'p', attrs={'class': 'c-headline__standfirst'})
             if content:
                 content_text.append(content.text.replace('/n ', '').strip())
             else:
@@ -79,28 +82,29 @@ def create_result_table(news):
             else:
                 link_text.append('sem link')
 
-    df0 = pd.DataFrame({'date': date, 'name': name, 'title_text': title_text, 'content_text': content_text, 'link': link_text})
+    df0 = pd.DataFrame({'date': date, 'name': name, 'title_text': title_text,
+                       'content_text': content_text, 'link': link_text})
     df = df0.copy()
     df = df.drop_duplicates()
 
-    print('\n Number of news items found: ',len(df0))
-    print(' Number of duplicated news found: ',df0.duplicated().sum())
-    print(' Final news considered: ',len(df))
+    print('\n Number of news items found: ', len(df0))
+    print(' Number of duplicated news found: ', df0.duplicated().sum())
+    print(' Final news considered: ', len(df))
 
     return df
 
-def save_table(df):
+
+def save_table(df, hard_key):
     h = pd.Timestamp.today()
-    df.to_csv(f'data_{h.date()}_{hard_key.replace('"','').replace(' ', '_')}.csv')
-    print(f'\nSaving DataFrame as data_{h.date()}_{hard_key.replace('"','').replace(' ', '_')}.csv')
+    df.to_csv(f'data_{h.date()}_{hard_key.replace(
+        '"', '').replace(' ', '_')}.csv')
+    print(f'\nSaving DataFrame as data_{h.date()}_{
+          hard_key.replace('"', '').replace(' ', '_')}.csv')
     print('\nDataFrame info: \n')
     print(df.info())
 
 
-
-#%%
-noticias_t = get_news(hard_key=hard_key)
-df = create_result_table(noticias_t)
-save_table(df)
-
-
+# %%
+#noticias_t = get_news(hard_key=hard_key)
+#df = create_result_table(noticias_t)
+#save_table(df)
