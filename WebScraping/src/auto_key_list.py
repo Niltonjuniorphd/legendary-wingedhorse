@@ -1,8 +1,14 @@
 # %%
 import pandas as pd
+import seaborn as sns
+import seaborn as sns
+import matplotlib.pyplot as plt
+from fpdf import FPDF
+import re
+
 
 # %%
-df = pd.read_csv('data_2024-07-20_ações_da_petrobras.csv')
+df = pd.read_csv('data_2024-08-01_maduro.csv')
 
 for i, j in enumerate(df['date']):
     df.loc[i, 'date_b'] = pd.to_datetime(j.replace('às', '')
@@ -42,10 +48,9 @@ full_text = ' '.join(content_text.unique())\
     .replace('"', '')\
     .strip()
 
-import re
 
 def remover_artigos_preposicoes(texto):
-    palavras_para_remover = r'\b(?:que|foi|tem|dia|dispensar|diz|ou|pelo|pelos|anos|agora|ser|quando|mais|gente|ano|deste|como|seu|é|não|se|ter|sido|são|duas|ele|ela|ficou|e|a|o|as|os|um|uns|uma|umas|de|do|da|dos|das|em|no|na|nos|nas|por|pelos|pela|pelas|ao|aos|à|às|com|para|perante|contra|entre|sob|sobre|trás)\b'
+    palavras_para_remover = r'\b(?:que|mas|ver|foi|tem|dia|dispensar|diz|ou|pelo|pelos|anos|agora|ser|quando|mais|gente|ano|deste|como|seu|é|não|se|ter|sido|são|duas|ele|ela|ficou|e|a|o|as|os|um|uns|uma|umas|de|do|da|dos|das|em|no|na|nos|nas|por|pelos|pela|pelas|ao|aos|à|às|com|para|perante|contra|entre|sob|era|sua|está|dizer|já|eu|você|sobre|trás)\b'
     
     # Usando regex para substituir as palavras por uma string vazia
     texto_limpo = re.sub(palavras_para_remover, '', texto, flags=re.IGNORECASE)
@@ -73,7 +78,7 @@ df_c=pd.Series()
 for i, j in enumerate(df['content_text']):
     col = pd.DataFrame()
     for p in keys.value_counts().head(100).index:
-        if p in j.lower():
+        if ((len(p) > 2) and (p in j.lower())):
             col.loc[i, p] = 1
             
         else:
@@ -83,4 +88,70 @@ for i, j in enumerate(df['content_text']):
 dfw = pd.concat([df, df_c.drop(0, axis=1).astype('int')], axis=1)
 
 # %%
-dfw.select_dtypes('int').sum()[0:50].sort_values(ascending=False)
+# Assuming dfw is already defined
+result = df_c.select_dtypes('float').sum()[0:50].sort_values(ascending=False)
+
+# Transform the result into a list of dictionaries
+result_list = [{index: value} for index, value in result.items()]
+
+# Print the result
+print(result_list)
+
+#%%
+
+# Function to create and save a plot
+def save_plot(data, filename, xlabel, ylabel, title):
+    sns.barplot(x=data.index, y=data.values)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.savefig(filename)
+    plt.close()
+
+# Function to add a figure with a header to the PDF
+def add_figure_to_pdf(pdf, image_file, header_text, x=10, y=20, w=190):
+    pdf.set_font('Arial', 'B', 12)
+    pdf.cell(0, 10, header_text, ln=True, align='C')
+    pdf.image(image_file, x=x, y=y, w=w)
+    pdf.ln(85)  # Adjust the space between images
+
+def add_list_to_pdf(pdf, result_list, header_text):
+    pdf.set_font('Arial', 'B', 12)
+    pdf.cell(0, 10, header_text, ln=True, align='C')
+    pdf.ln(1)
+    pdf.set_font('Arial', '', 10)
+    
+    for i, item in enumerate(result_list):
+        for key, value in item.items():
+            pdf.cell(0, 5, f'{i} - {key}: {value}', ln=True)
+
+# Sample data for different figures
+data1 = df['year'].value_counts()  # Replace 'another_column' with your actual column
+data2 = df['month'].value_counts()
+
+# Save the first figure
+save_plot(data1, 'plot1.png', 'Year', 'Count', 'Year Distribution')
+
+# Save the second figure
+save_plot(data2, 'plot2.png', 'Month', 'Count', 'Month Distribution')
+
+# Create a PDF document
+pdf = FPDF()
+pdf.add_page()
+
+# Insert the first figure with a header
+add_figure_to_pdf(pdf, 'plot1.png', 'Figure 1: Year Distribution')
+
+pdf.add_page()
+# Insert the second figure with a header
+add_figure_to_pdf(pdf, 'plot2.png', 'Figure 2: Month Distribution')
+
+pdf.add_page()
+# Insert the result_list into the PDF with a header
+add_list_to_pdf(pdf, result_list, 'Page 3: Summary of Integer Columns')
+
+# Save the PDF
+pdf.output('multiple_plots_document.pdf')
+
+
+# %%
