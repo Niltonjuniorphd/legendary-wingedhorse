@@ -13,7 +13,7 @@ class ClassName:
         self.var2 = name_var2
         self.var3 = name_var3
 
-    #The next sequance of def define the functions of the class
+    #The next sequence of def define the functions of the class
     def FunctionActionPrint(self):
         print("This is a function that print the value of the var1") #print some text to the screen
         print(self.var1) #print the value of the variable var1
