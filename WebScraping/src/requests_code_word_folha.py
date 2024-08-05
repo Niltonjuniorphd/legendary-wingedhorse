@@ -1,14 +1,10 @@
-
 import requests
 import pandas as pd
 
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
-
-# hard_key = '"venezuela"'
-
-def get_news(hard_key=input('type the hard_key: ')):
+def get_news(hard_key):
     print(f'\nHard_key used to scrap: {hard_key}')
     print(f'\nDate: {pd.Timestamp.today().date()}')
 
@@ -37,7 +33,7 @@ def get_news(hard_key=input('type the hard_key: ')):
         noticias_t.append(site.find_all(
             'li', attrs={'class': 'c-headline c-headline--newslist'}))
 
-    return noticias_t, hard_key
+    return noticias_t
 
 
 def create_result_table(news):
@@ -104,7 +100,8 @@ def save_table(df, hard_key):
     print(df.info())
 
 
-# %%
-#noticias_t = get_news(hard_key=hard_key)
-#df = create_result_table(noticias_t)
-#save_table(df)
+hard_key=input('type the hard_key: ')
+
+noticias_t = get_news(hard_key)
+df = create_result_table(noticias_t)
+save_table(df, hard_key)
