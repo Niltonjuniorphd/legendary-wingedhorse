@@ -16,29 +16,20 @@ from functions import (format_date_column,
 
 # %%
 hard_key = input('type the hard_key: ')  # get the word keys
-
-# get the news from https://search.folha.uol.com.br using the hard_key
-noticias_t = get_news(hard_key)
+noticias_t = get_news(hard_key)# get the news from https://search.folha.uol.com.br using the hard_key
 df = create_result_table(noticias_t)  # transform the news in a dataframe
 save_table(df, hard_key)  # save the dataframe as a csv file
 
 # %%
-# clean some datetime language context portuguese->english and create datetime columns
-df = format_date_column(df)
-# join the text from the news as unique variable
-content_text = full_text(df['content_text'])
-# remove articles and prepositions from the text
-full_text_cleaned = remover_artigos_preposicoes(content_text)
-# create a dataframe with the words counts
-df_c = df_words_key(full_text_cleaned, df)
-
-dfw = pd.concat([df, df_c.drop(0, axis=1).astype('int')],
-                axis=1)  # concat the dataframes
+df = format_date_column(df)# clean some datetime language context portuguese->english and create datetime columns
+content_text = full_text(df['content_text'])# join the text from the news as unique variable
+full_text_cleaned = remover_artigos_preposicoes(content_text)# remove articles and prepositions from the text
+df_c = df_words_key(full_text_cleaned, df)# create a dataframe with the words counts
+dfw = pd.concat([df, df_c.drop(0, axis=1).astype('int')], axis=1)  # concat the dataframes
 
 # %%
 result = df_c.select_dtypes('float').sum()[0:50].sort_values(ascending=False)
-# create a list of dictionaries with the words counts
-result_list = [{index: value} for index, value in result.items()]
+result_list = [{index: value} for index, value in result.items()]# create a list of dictionaries with the words counts
 print(result_list)
 
 # %%
@@ -46,8 +37,8 @@ print(result_list)
 data1 = df['year'].value_counts()
 data2 = df['month'].value_counts()
 
-save_plot(data1, 'plot1.png', 'Year', 'Count', 'Year Distribution')
-save_plot(data2, 'plot2.png', 'Month', 'Count', 'Month Distribution')
+save_plot(data1, f'plot1_{hard_key}.png', 'Year', 'Count', 'Year Distribution')
+save_plot(data2, f'plot2_{hard_key}.png', 'Month', 'Count', 'Month Distribution')
 
 # %%
 # summary texts using google gemini API
@@ -57,7 +48,11 @@ summary1 = summary1.encode("utf-8", "replace").decode("utf-8")
 print(f'reult summary1: {summary1}\n')
 
 # %%
-full_text_nyt = nyt_summary(hard_key)
+try:
+    full_text_nyt = nyt_summary(hard_key)
+except:
+    full_text_nyt = 'No results found'
+    print('No results found')
 
 summary2 = generate_gemini_response(f'generate a summary using the text: {full_text_nyt}')
 summary2 = summary2.encode("utf-8", "replace").decode("utf-8")
