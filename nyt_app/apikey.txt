@@ -1,0 +1,10 @@
+
+API key
+XsoNAoGpQgAjeWQmXobmXYOYXJwRbh3Y
+
+
+
+app ID
+a2a53709-255f-4b27-82db-f0585d6befeb
+
+https://api.nytimes.com/svc/search/v2/articlesearch.json?q=election&api-key=yourkey
