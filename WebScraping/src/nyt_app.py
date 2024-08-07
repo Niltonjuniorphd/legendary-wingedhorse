@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import os
+from tqdm import tqdm
 
 
 
@@ -9,7 +10,7 @@ def nyt_summary(key_word):
     full_text_nyt = ''
     df0 = pd.DataFrame()
 
-    for page in range(0, 5):
+    for page in tqdm(range(0, 5), bar_format='{desc:<5.5}{percentage:3.0f}%|{bar:20}{r_bar}'):
         response = []
         data = []
         artcles = []
@@ -27,8 +28,6 @@ def nyt_summary(key_word):
         df0 = pd.concat([df0, articles_df], axis=0)
 
     df0 = df0.reset_index(drop=True)
-
-    print(df0.columns.to_list())
 
     full_text_nyt = ' '.join(df0['abstract'].unique())\
         .replace('...', '')\
