@@ -1,4 +1,4 @@
 .env
 *.csv
 __pycache__
-*.dbgit rm
+*.db
