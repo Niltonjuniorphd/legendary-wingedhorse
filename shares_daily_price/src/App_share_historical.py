@@ -1,8 +1,12 @@
 
+#%%
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+import time
+import pandas as pd
+
 from moduli_functions import (call_driver,
                               send_focus_key,
                               get_links,
@@ -11,17 +15,18 @@ from moduli_functions import (call_driver,
                               create_database,
                               query_database
                               )
-import time
-import pandas as pd
 
 
+#%%
 driver = call_driver()
 
+#%%
 time.sleep(2)
 focus_key = 'ações petrobras'
 send_focus_key(driver, focus_key=focus_key)
 
-
+#%%
+print('initiating get the share values... ')
 time.sleep(5)
 values = WebDriverWait(driver, 4).until(
     EC.presence_of_all_elements_located((By.XPATH, "//span[@jsname='vWLAgc']")))
@@ -35,6 +40,9 @@ value_close = values_close[0].text
 time.sleep(5)
 values_other = WebDriverWait(driver, 4).until(
     EC.presence_of_all_elements_located((By.XPATH, "//div[@class='maIvLb']")))
+
+print('end get the share values... ')
+
 
 texts, links = get_links(driver, xpath="//a[@jsname='UWckNb']", pg_num=20)
 
@@ -74,3 +82,5 @@ print('\033[92m\n         -----End of program-----\033[0m\n')
 time.sleep(2)
 query_database()
 
+
+# %%
