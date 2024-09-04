@@ -34,7 +34,6 @@ def call_driver():
     
     # Initialize the driver with the specified options
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
     print("Driver ready... ")
 
     return driver
@@ -178,15 +177,15 @@ def get_response(links):
             res = requests.get(links[i], timeout=3)
             time.sleep(1.5)
             responses.append(res)
-            print(f'request link {
-                  i}/{len(links)} -> status code: {responses[i].status_code} link: {links[i]}')
             response_status.append(
                 f'req {i} - status: {responses[i].status_code} ')
 
+            print(f'request link {i+1}/{len(links)} -> status code: {responses[i].status_code} link: {links[i]}')
+
         except requests.exceptions.RequestException as e:
             print(f"No response from link {i}: {e}")
-            response_status.append(f"No response from link {i}: {e}")
             responses.append(np.nan)
+            response_status.append(f"No response from link {i}: {e}")
 
     print('Requests done... ')
     return responses, response_status
@@ -218,9 +217,12 @@ def get_words_re(responses, words_pattern):
 
     for response in responses:
         if type(response) != float:
-            soup = BeautifulSoup(response.content, 'html.parser')
+            soup = BeautifulSoup(response.text, 'html.parser')
             page_text = soup.get_text()
-            word = re.findall(words_pattern, page_text)
+            page_text = re.sub(r'[^a-zA-Z0-9\s]', ' ', page_text)
+            page_text = page_text.lower()
+            page_text = page_text.strip()
+            word = re.findall(words_pattern.lower(), page_text)
             if word:
                 words.append(word)
                 freq_word.append(len(word))
@@ -290,8 +292,9 @@ def create_database():
 
     if os.path.exists(historical_csv):
         df_daily = pd.read_csv(daily_csv, encoding='utf-8')
+        df_historical = pd.read_csv(historical_csv, encoding='utf-8')
         today = pd.Timestamp.today().date() + pd.Timedelta(days=0)
-        if df_daily['Date'].loc[0] == today.strftime('%Y-%m-%d'):
+        if df_historical['Date'].iloc[-1] == today.strftime('%Y-%m-%d'):
             print(f'\nDate context used value {today}')
             print('\033[91mData already exists in the historical CSV\033[0m\n')
             print('\033[91mNo Data has been added to the database\033[0m\n')
