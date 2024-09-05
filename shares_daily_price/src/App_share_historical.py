@@ -12,8 +12,8 @@ from moduli_functions import (call_driver,
                               get_links,
                               get_response,
                               make_sample_df,
-                              create_database,
-                              query_database
+                              query_database,
+                              create_database
                               )
 
 
@@ -44,7 +44,7 @@ values_other = WebDriverWait(driver, 4).until(
 print('end get the share values... ')
 
 
-texts, links = get_links(driver, xpath="//a[@jsname='UWckNb']", pg_num=20)
+texts, links = get_links(driver, xpath="//a[@jsname='UWckNb']", pg_num=1)
 
 responses, response_status = get_response(links)
 
@@ -70,17 +70,26 @@ sample_date['value_close'] = value_close
 
 print('all counting words done... ')
 
+#%%
 
 date = pd.Timestamp.today().date() + pd.Timedelta(days=0)
-sample_date.to_csv(f'data_raw/sample_date_{focus_key}_{date}.csv')
-sample_date.to_csv(f'database/daily_data.csv')
+sample_date.to_csv(f'data_raw/sample_date_{focus_key}_{date}.csv', index=False)
+pd.DataFrame(sample_date).T.to_csv(f'database/daily_data.csv', index=False)
 
-create_database()
+#%%
+create_database(sample_date=sample_date.tolist())
+
+
 print('\033[92m\n-----All process successfully done...-----\033[0m\n')
 print('\033[92m\n         -----End of program-----\033[0m\n')
 
-time.sleep(2)
-query_database()
+db__path = 'database/historical_data.db'
+query_database(db__path)
+
+#db__path2 = 'historical_data.db'
+#query_database(db__path2)
+
+
 
 
 # %%

@@ -265,12 +265,12 @@ def make_sample_df(word_list, responses):
         words_data = pd.concat([words_data, pd.Series(word, name=words_pattern)],axis=1)
         words_freq = pd.concat([words_freq, pd.Series(freq, name=words_pattern)],axis=1)
 
-    sample_date = pd.DataFrame(words_freq.sum()).T
+    sample_date = pd.Series(words_freq.sum())
     sample_date['Date'] = pd.Timestamp.today().date() + pd.Timedelta(days=0)
     
     return sample_date
 
-def create_database():
+def create_database(sample_date):
 
     """
     Manages the creation and updating of a historical data CSV and a SQLite database.
@@ -294,6 +294,7 @@ def create_database():
         df_daily = pd.read_csv(daily_csv, encoding='utf-8')
         df_historical = pd.read_csv(historical_csv, encoding='utf-8')
         today = pd.Timestamp.today().date() + pd.Timedelta(days=0)
+
         if df_historical['Date'].iloc[-1] == today.strftime('%Y-%m-%d'):
             print(f'\nDate context used value {today}')
             print('\033[91mData already exists in the historical CSV\033[0m\n')
@@ -302,7 +303,8 @@ def create_database():
             df_daily.to_csv(historical_csv, mode='a', header=False, index=False, encoding='utf-8')
             print('Data added to the historical CSV.')
             print('Initiating save sqlite3 data... ')
-            create_database_sqlite3()
+            #create_database_sqlite3()
+            handle_database(sample_date)
             print('Save sqlite3 data successfully done...\n ')
 
         
@@ -311,10 +313,22 @@ def create_database():
         df_historical.to_csv(historical_csv, index=False)
         print('Creating a historical CSV and add the first daily data.')
         print('Creating the sqlite3 database... ')
-        create_database_sqlite3()
+        #create_database_sqlite3()
+        handle_database(sample_date)
         print('All successfully done...\n ')
 
 
+def handle_database(data):
+
+    database_path = 'database/historical_data.db'
+
+    if os.path.exists(database_path):
+        insert_data(data)
+        print('Daily data added to the database.')
+    else:
+        create_database_sqlite3()
+        insert_data(data)
+        print('Creating database and added the first daily data.')
 
 def create_database_sqlite3():
     """
@@ -327,19 +341,77 @@ def create_database_sqlite3():
 
     """
 
-    daily_data_csv = 'database/daily_data.csv'
+    #daily_data_csv = 'database/daily_data.csv'
+    #conn = sqlite3.connect('historical_data.db')
+    #cursor = conn.cursor()
+    #df = pd.read_csv(daily_data_csv)
+    #df.to_sql('historical_data', conn, if_exists='append', index=False)
+    #conn.close()
 
-    conn = sqlite3.connect('historical_data.db')
-    cursor = conn.cursor()
+    sql_create_order = """
+        CREATE TABLE IF NOT EXISTS historical_data (
+        subiu DECIMAL(10,2),
+        caiu DECIMAL(10,2),
+        salta DECIMAL(10,2),
+        queda DECIMAL(10,2),
+        aumenta DECIMAL(10,2),
+        dispara DECIMAL(10,2),
+        desaba DECIMAL(10,2),
+        desabam DECIMAL(10,2),
+        podem_cair DECIMAL(10,2),
+        podem_subir DECIMAL(10,2),
+        barata DECIMAL(10,2),
+        Date DATETIME,
+        value DECIMAL(10,2),
+        value_close DECIMAL(10,2)
+    );
+    """
+    try:
+        conn = sqlite3.connect('database/historical_data.db')
+        cur = conn.cursor()
+        cur.execute(sql_create_order)
+        conn.commit()
+        print("Database created successfully")
+    except conn.DatabaseError as erro:
+        print("Erro no banco de dados", erro)
+    finally:
+        if conn:
+            conn.close()
+            print("Connection closed")
 
-    df = pd.read_csv(daily_data_csv)
 
-    df.to_sql('historical_data', conn, if_exists='append', index=False)
 
+def insert_data(data):
+    """
+    Inserts data into a SQLite database.
+    """
+    sql_insert_order = """
+        INSERT INTO historical_data (
+        subiu,
+        caiu,
+        salta,
+        queda,
+        aumenta,
+        dispara,
+        desaba,
+        desabam,
+        podem_cair,
+        podem_subir,
+        barata,
+        Date,
+        value,
+        value_close) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+
+    conn = sqlite3.connect('database/historical_data.db')
+    cur = conn.cursor()
+    cur.execute(sql_insert_order, data)
+    conn.commit()
     conn.close()
 
 
-def query_database():
+
+def query_database(db__path):
     """
     Queries and prints all records from the 'historical_data' table in a SQLite database.
 
@@ -350,7 +422,7 @@ def query_database():
     Raises:
         sqlite3.DatabaseError: If there is an error connecting to or querying the SQLite database.
     """
-    conn = sqlite3.connect('historical_data.db')
+    conn = sqlite3.connect(db__path)
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM historical_data")
