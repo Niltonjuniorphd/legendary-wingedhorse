@@ -318,6 +318,8 @@ def create_database(sample_date):
         print('All successfully done...\n ')
 
 
+
+
 def handle_database(data):
 
     database_path = 'database/historical_data.db'
@@ -408,6 +410,7 @@ def insert_data(data):
     cur.execute(sql_insert_order, data)
     conn.commit()
     conn.close()
+    print('Data inserted successfully.')
 
 
 

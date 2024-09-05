@@ -20,12 +20,10 @@ from moduli_functions import (call_driver,
 #%%
 driver = call_driver()
 
-#%%
 time.sleep(2)
 focus_key = 'ações petrobras'
 send_focus_key(driver, focus_key=focus_key)
 
-#%%
 print('initiating get the share values... ')
 time.sleep(5)
 values = WebDriverWait(driver, 4).until(
@@ -88,8 +86,3 @@ query_database(db__path)
 
 #db__path2 = 'historical_data.db'
 #query_database(db__path2)
-
-
-
-
-# %%
