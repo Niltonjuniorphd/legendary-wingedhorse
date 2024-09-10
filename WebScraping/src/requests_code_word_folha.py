@@ -1,3 +1,4 @@
+#%%
 import requests
 import pandas as pd
 
@@ -105,3 +106,5 @@ hard_key=input('type the hard_key: ')
 noticias_t = get_news(hard_key)
 df = create_result_table(noticias_t)
 save_table(df, hard_key)
+
+# %%
