@@ -6,6 +6,11 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 import time
 from bs4 import BeautifulSoup
 import re
@@ -455,19 +460,16 @@ def get_news(hard_key):
     print(f'\n searching for {hard_key} ...\n')
 
     for page in tqdm(range(1, 201, 25), bar_format='{desc:<5.5}{percentage:3.0f}%|{bar:20}{r_bar}'):
-        noticias = []
+        
+        url = f'https://search.folha.uol.com.br/?q={hard_key}&site=todos&sr={page}'
 
-        when = f'https://search.folha.uol.com.br/?q={
-            hard_key}&site=todos&sr={page}'
-
-        response = requests.get(when, headers=headers, timeout=5)
+        response = requests.get(url, headers=headers, timeout=5)
 
         content = response.content
         site = BeautifulSoup(content, 'html.parser')
 
         # noticias = site.find_all('li', attrs={'class': 'c-headline c-headline--newslist'})
-        noticias_t.append(site.find_all(
-            'li', attrs={'class': 'c-headline c-headline--newslist'}))
+        noticias_t.append(site.find_all('li', attrs={'class': 'c-headline c-headline--newslist'}))
 
     return noticias_t
 
@@ -482,8 +484,7 @@ def create_result_table(news):
 
     for i, j in enumerate(news):
         for noticia in j:
-            journal = noticia.find(
-                'h3', attrs={'class': 'c-headline__kicker c-kicker c-search__result_h3'})
+            journal = noticia.find('h3', attrs={'class': 'c-headline__kicker c-kicker c-search__result_h3'})
             if journal:
                 name.append(journal.text.replace('/n ', '').strip())
             else:
@@ -501,8 +502,7 @@ def create_result_table(news):
             else:
                 title_text.append('sem title')
 
-            content = noticia.find(
-                'p', attrs={'class': 'c-headline__standfirst'})
+            content = noticia.find('p', attrs={'class': 'c-headline__standfirst'})
             if content:
                 content_text.append(content.text.replace('/n ', '').strip())
             else:
@@ -536,3 +536,23 @@ def save_table(df, hard_key):
     print(df.info())
 
 
+def tokenize(text):
+    stop_words = stopwords.words("portuguese")
+    lemmatizer = WordNetLemmatizer()
+    text = re.sub(r"[^a-zA-ZçÇáàâãéêíóôõúüÁÀÂÃÉÊÍÓÔÕÚÜ\s]", " ", text.lower())# normalize case and remove punctuation
+    tokens = word_tokenize(text)# tokenize text
+    tokens_lemma = [lemmatizer.lemmatize(word) for word in tokens if word not in stop_words]# lemmatize (replace inflections forms) and remove stop words (nouns, propositions...)
+
+    return tokens_lemma
+
+
+def countVector_tfidf(df):
+    vect = CountVectorizer(tokenizer=tokenize)  
+    transformer = TfidfTransformer(smooth_idf=False)
+    
+    X1 = vect.fit_transform(df) #matrix of token counts in the 'title_text' column
+    tfidf = transformer.fit_transform(X1)
+    
+    columns=vect.get_feature_names_out()
+
+    return tfidf, columns
