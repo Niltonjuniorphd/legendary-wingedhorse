@@ -22,29 +22,34 @@ driver = call_driver()
 
 time.sleep(2)
 focus_key = 'ações petrobras'
-send_focus_key(driver, focus_key=focus_key)
+send_focus_key(driver, focus_key=focus_key)# 
 
 print('initiating get the share values... ')
 time.sleep(5)
 values = WebDriverWait(driver, 4).until(
-    EC.presence_of_all_elements_located((By.XPATH, "//span[@jsname='vWLAgc']")))
+    EC.presence_of_all_elements_located((By.XPATH, "//span[@jsname='vWLAgc']")))#valor da ação em focus_key para 'https://google.com/ncr
 value = values[0].text
 
 time.sleep(5)
 values_close = WebDriverWait(driver, 4).until(
-    EC.presence_of_all_elements_located((By.XPATH, "//span[@jsname='qRSVye']")))
+    EC.presence_of_all_elements_located((By.XPATH, "//span[@jsname='qRSVye']")))#valor do aumento/queda da ação em focus_key
 value_close = values_close[0].text
 
 time.sleep(5)
 values_other = WebDriverWait(driver, 4).until(
-    EC.presence_of_all_elements_located((By.XPATH, "//div[@class='maIvLb']")))
+    EC.presence_of_all_elements_located((By.XPATH, "//div[@class='maIvLb']")))#valores de outras ações (painel lateral)
 
-print('end get the share values... ')
+print('end get the share dayli values... ')
+print('---------------------------------------')
+print(f'value: {value}')
+print(f'value_close: {value_close}')
+print(f'value_other: {values_other[0].text}')
+print('---------------------------------------')
 
 
-texts, links = get_links(driver, xpath="//a[@jsname='UWckNb']", pg_num=1)
+texts, links = get_links(driver, xpath="//a[@jsname='UWckNb']", pg_num=1)#monta a lista de links e textos das fontes relacionadas na pg do google, desde a página de 1 até pg_num.
 
-responses, response_status = get_response(links)
+responses, response_status = get_response(links)#monta a lista de requests em cada uma das fontes em links
 
 
 print('initiating save words... ')
@@ -62,7 +67,7 @@ word_list = [
     'podem subir',
     'barata']
 
-sample_date = make_sample_df(word_list, responses)
+sample_date = make_sample_df(word_list, responses)#usa get_words_re() e cria 
 sample_date['value'] = value
 sample_date['value_close'] = value_close
 

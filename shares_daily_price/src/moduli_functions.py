@@ -25,7 +25,7 @@ def call_driver():
         WebDriver: An instance of the Chrome WebDriver configured to run headless.
     """
     options = Options()
-    options.add_argument("--headless")  # Run in headless mode
+    #options.add_argument("--headless")  # Run in headless mode
     options.add_argument("--disable-gpu")  # Disable GPU hardware acceleration
     options.add_argument("--incognito")  # Run in incognito mode
     options.add_argument("--no-sandbox")  # Disable sandboxing
@@ -65,7 +65,7 @@ def send_focus_key(driver, focus_key):
         search_box = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.NAME, "q"))
         )
-        print("Focus key sent... ")
+        print(f"Focus key: -{focus_key}- sent to google serach box... ")
         search_box.clear()  # Clear any pre-existing text
         search_box.send_keys(focus_key)
         search_box.send_keys(Keys.RETURN)
@@ -143,7 +143,7 @@ def get_links(driver, xpath="//a[@jsname='UWckNb']", pg_num=20):
         except:
             print("end of pages")
             break
-    print('\033[92mlinks and texts acquired... \033[0m\n')
+    print('\033[92mlinks and texts successfully acquired... \033[0m\n')
     return texts, links
 
 
@@ -237,7 +237,7 @@ def get_words_re(responses, words_pattern):
         else:
             words.append(["Time out"])
             freq_word.append(np.nan)
-    print(f'counting word "{words_pattern}"  done...')
+    print(f'counting word "{words_pattern}", count: {freq_word}  done...')
     return words, freq_word
 
 
